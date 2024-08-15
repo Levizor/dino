@@ -22,7 +22,20 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(fmt SFML)
 
-add_executable(dino src/main.cpp src/Game.h src/Game.cpp src/Menu.h src/Menu.cpp)
+
+
+add_executable(
+        dino 
+        src/main.cpp 
+        src/Game.h src/Game.cpp
+        src/Menu.h src/Menu.cpp 
+        src/Globals.h src/Globals.cpp
+        src/ObjectManager.h src/ObjectManager.cpp
+        src/Button.h src/Button.cpp
+
+        src/gameObjects/Dino.h src/gameObjects/Dino.cpp
+        src/gameObjects/Background.h src/gameObjects/Background.cpp
+)
 
 target_link_libraries(dino fmt sfml-window sfml-graphics)
 

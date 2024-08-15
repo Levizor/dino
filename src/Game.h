@@ -3,28 +3,47 @@
 
 #include "Menu.h"
 #include "SFML/Graphics/RenderWindow.hpp"
+#include "SFML/Graphics/View.hpp"
+#include "SFML/System/Clock.hpp"
 #include "SFML/System/Vector2.hpp"
+#include "ObjectManager.h"
+
 
 class Game{
 
     public:
+        Game():_menu((*this)){};
+
+        sf::RenderWindow rw; 
+        void clear();
+        sf::Vector2u resoultion;
+        ObjMan om;
+        void draw();
+
+
         void init();
         void start();
-
+        void play();
+        void quit();
         bool isExiting();
 
+
+
     private:
-        sf::RenderWindow _rw; 
         enum State{
             Exiting, Playing, InMenu
         };
 
+        sf::View view;
+
         State _state;
 
-        sf::Vector2u _resoultion;
-
-        void loop();
+        void playLoop(const sf::Event& event);
     
         Menu _menu;
 
+        sf::Clock clock; 
+
 };
+
+
