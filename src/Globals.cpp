@@ -12,3 +12,5 @@ const std::string TEXTURES[] = {
 };
 
 const std::string FONT_PATH = "src/assets/BigBlueTermPlusNerdFont-Regular.ttf";
+
+const std::string ROAD_LINES_TEXTURE_PATH = "src/assets/lines.png";

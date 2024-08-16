@@ -8,3 +8,4 @@ extern const std::string DINO_TEXTURE_PATH;
 
 extern const std::string TEXTURES[];
 extern const std::string FONT_PATH;
+extern const std::string ROAD_LINES_TEXTURE_PATH;

@@ -2,6 +2,7 @@
 
 
 #include "Menu.h"
+#include "Run.h"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "SFML/Graphics/View.hpp"
 #include "SFML/System/Clock.hpp"
@@ -12,37 +13,37 @@
 class Game{
 
     public:
-        Game():_menu((*this)){};
+        Game():_menu(*this), _run(*this){};
+        ObjMan om;
 
         sf::RenderWindow rw; 
         void clear();
         sf::Vector2u resoultion;
-        ObjMan om;
         void draw();
 
 
         void init();
         void start();
         void play();
+        void gameOver();
         void quit();
+        void display();
         bool isExiting();
 
 
 
     private:
         enum State{
-            Exiting, Playing, InMenu
+            Exiting, Playing, InMenu, GameOver
         };
 
         sf::View view;
 
         State _state;
 
-        void playLoop(const sf::Event& event);
-    
         Menu _menu;
+        Run _run;
 
-        sf::Clock clock; 
 
 };
 

@@ -4,7 +4,6 @@
 #include "SFML/Graphics/View.hpp"
 #include "SFML/Window/Event.hpp"
 #include "fmt/core.h"
-#include <iostream>
 
 float aspectRatio = 16./9;
 
@@ -15,7 +14,7 @@ void Game::init(){
         sf::VideoMode(
             1600, 900, 32),
         "Dino");
-    rw.setFramerateLimit(30);
+    rw.setFramerateLimit(60);
     rw.setKeyRepeatEnabled(false);
 
     _menu.init();
@@ -28,7 +27,6 @@ void Game::init(){
     rw.requestFocus();
     bool fine = om.loadAll();
     fmt::println("Loaded fine {}", fine);
-        sf::Font _font;
     
 
 }
@@ -68,18 +66,18 @@ void Game::start(){
                 _menu.loop(event);
                 break;
             case Playing:
-                playLoop(event);
+                _run.playLoop(event);
+                break;
+            case GameOver:
+                _run.gameOverLoop(event);
+                break;
+
         }
     }
 }
 
 bool Game::isExiting(){
     return _state==State::Exiting;
-}
-
-void Game::playLoop(const sf::Event& event){
-
-    draw();
 }
 
 void Game::clear(){
@@ -90,12 +88,19 @@ void Game::draw(){
     om.drawAll(rw);
 }
 
+void Game::display(){
+    rw.display();
+}
+
 void Game::quit(){
     _state = Exiting;
 }
 
 void Game::play(){
     _state = Playing;
-    clock.restart();
-    om.getDino()->jump();
+    _run.restart();
+}
+
+void Game::gameOver(){
+    _state = GameOver;
 }

@@ -1,7 +1,9 @@
 #include "Menu.h"
 #include "Button.h"
-#include "SFML/System/Vector2.hpp"
+
 #include "Game.h"
+#include "SFML/Window/Event.hpp"
+#include "SFML/Window/Keyboard.hpp"
 #include "fmt/core.h"
 
 
@@ -38,24 +40,24 @@ void Menu::loop(const sf::Event& event){
     _game.clear();
     _game.draw();
 
+    _game.rw.draw(_playButton);
+    _game.rw.draw(_quitButton);
+    _game.rw.draw(_label);
+    _game.display();
+
     _playButton.update(event, _game.rw);
     _quitButton.update(event, _game.rw);
 
-    if(_quitButton.isPressed()){
+    if(_quitButton.isPressed() or sf::Keyboard::isKeyPressed(sf::Keyboard::Q)){
         _game.quit();
         return;
     }
 
-    if(_playButton.isPressed()){
+    if(_playButton.isPressed() or sf::Keyboard::isKeyPressed(sf::Keyboard::Space)){
         _game.play();
         return;
     }
 
-    _game.rw.draw(_playButton);
-    _game.rw.draw(_quitButton);
-    _game.rw.draw(_label);
-
-    _game.rw.display();
 }
 
 void Menu::draw(){

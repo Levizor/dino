@@ -29,6 +29,7 @@ add_executable(
         src/main.cpp 
         src/Game.h src/Game.cpp
         src/Menu.h src/Menu.cpp 
+        src/Run.h src/Run.cpp
         src/Globals.h src/Globals.cpp
         src/ObjectManager.h src/ObjectManager.cpp
         src/Button.h src/Button.cpp
