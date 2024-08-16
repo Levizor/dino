@@ -5,13 +5,38 @@
 #include "SFML/Window/Mouse.hpp"
 #include "fmt/core.h"
 #include <ctime>
+#include "Score.h"
 
 float ACCELERATION = 0.25;
+
+void Run::init(){
+    _score.setFont(*_game.om.getFont());
+    _score.setFillColor(sf::Color(0xf7b801ff));
+    _score.setCharacterSize(50);
+    _score.setString("00000000");
+
+    sf::Vector2u ws = _game.rw.getSize();
+    _score.setOrigin(_score.getGlobalBounds().width, 0);
+    _score.setPosition(ws.x-10, 10);
+
+    _bestScore.setFont(*_game.om.getFont());
+    _bestScore.setFillColor(sf::Color(0xf7b801ff));
+    _bestScore.setCharacterSize(50);
+    _bestScore.setString(fmt::format("HI: {:08}", _game.getBestScore()));
+
+    _bestScore.setOrigin(_score.getGlobalBounds().width, 0);
+    _bestScore.setPosition(_score.getGlobalBounds().left-150, 10);
+}
 
 void Run::playLoop(const sf::Event& event){
 
     if(isGameOver()){
-        _game.gameOver();
+        _game.setState(GameOver);
+        if(score>_game.getBestScore()){
+            _game.setBestScore(score);
+            _bestScore.setString(fmt::format("HI: {:08}", _game.getBestScore()));
+        }
+        return;
     }
 
     ObjMan& om = _game.om;
@@ -22,15 +47,16 @@ void Run::playLoop(const sf::Event& event){
 
     float deltaTime = _clock.restart().asSeconds();
     time+=deltaTime;
+    score=time*_speedModifier;
 
     timeSinceSpeedIncrease+=deltaTime;
-    if(timeSinceSpeedIncrease>5 and _speedModifier<15){
+    if(timeSinceSpeedIncrease>3 and _speedModifier<30){
         timeSinceSpeedIncrease=0;
         _speedModifier+=1;
     }
 
     timeSinceLastObstacle+=deltaTime; 
-    if(timeSinceLastObstacle>=1.2 and std::rand()%5==1){
+    if(timeSinceLastObstacle>=1.5 and std::rand()%5==1){
         timeSinceLastObstacle=0;
         addObstacle();
     }
@@ -38,18 +64,13 @@ void Run::playLoop(const sf::Event& event){
     om.getDino()->update(deltaTime);
     moveObstacles(deltaTime); 
 
+    _score.setString(fmt::format("{:08}", score));
+
     
     _game.clear();
     _game.draw();
-    drawObstacles();
+    drawScores();
     _game.display();
-
-}
-
-void Run::gameOverLoop(const sf::Event& event){
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)){
-        _game.play();
-    } 
 }
 
 void Run::restart(){
@@ -108,4 +129,9 @@ bool Run::isGameOver(){
         }
     }
     return false;
+}
+
+void Run::drawScores(){
+    _game.rw.draw(_score);
+    _game.rw.draw(_bestScore);
 }

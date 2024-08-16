@@ -33,7 +33,9 @@ void Button::setText(std::string text){
 }
 
 bool Button::isPressed(){
-    return _isPressed;
+    bool p=_isPressed;
+    _isPressed=false;
+    return p;
 }
 void Button::update(const sf::Event& e, sf::RenderWindow& rw){
     sf::Vector2i mousePos = sf::Mouse::getPosition(rw);
@@ -42,7 +44,6 @@ void Button::update(const sf::Event& e, sf::RenderWindow& rw){
 
     if(_mouseInButton){
         if(e.type == sf::Event::MouseButtonPressed){
-            fmt::println("Pressed");
             _isPressed = true;
             _shape.setFillColor(c_pressed);
         }
@@ -81,9 +82,9 @@ void Button::setBackgroundColor(sf::Color color){
 
 void Button::setPosition(sf::Vector2f position){
     _shape.setPosition(position);
-    _text.setOrigin(_text.getGlobalBounds().getSize() / 2.f + _text.getLocalBounds().getPosition());
+    // _text.setOrigin(_text.getGlobalBounds().getSize() / 2.f + _text.getLocalBounds().getPosition());
     sf::Rect textRect = _text.getGlobalBounds();
-    int x = position.x + 10 + (_shape.getSize().x - textRect.width)/2;
+    int x = position.x + (_shape.getSize().x - textRect.width)/2;
     int y = position.y + (_shape.getSize().y - textRect.height)/2;
     _text.setPosition(x, y);
 

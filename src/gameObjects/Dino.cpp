@@ -46,8 +46,8 @@ void Dino::setHeight(const float& y){
 sf::FloatRect Dino::getHitbox(){
     sf::FloatRect rect = getGlobalBounds();
     rect.left=rect.left+0.25*rect.width;
-    rect.width=0.5*rect.width;
-    rect.height=rect.height*0.6;
+    rect.width=0.6*rect.width;
+    rect.height=rect.height*0.65;
 
     return rect;
     

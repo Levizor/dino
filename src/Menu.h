@@ -15,6 +15,8 @@ class Menu{
         void position();
 
         void loop(const sf::Event& event);
+        void gameOverLoop(const sf::Event& event);
+        void updateScore();
 
         void init();
     private:
@@ -22,7 +24,11 @@ class Menu{
         Game& _game;
         Button _playButton;
         Button _quitButton;
+        Button _repeatButton;
+        Button _MenuButton;
         sf::Text _label;
+        sf::Text _bsLabel;
         
-        std::vector<Button*> _buttons;
+        std::vector<Button*> _menuButtons;
+        std::vector<Button*> _gameOverButtons;
 };

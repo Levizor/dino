@@ -27,6 +27,7 @@ FetchContent_MakeAvailable(fmt SFML)
 add_executable(
         dino 
         src/main.cpp 
+        src/Score.h src/Score.cpp
         src/Game.h src/Game.cpp
         src/Menu.h src/Menu.cpp 
         src/Run.h src/Run.cpp

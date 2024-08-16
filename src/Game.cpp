@@ -4,30 +4,40 @@
 #include "SFML/Graphics/View.hpp"
 #include "SFML/Window/Event.hpp"
 #include "fmt/core.h"
+#include <fstream>
+#include <string>
+#include "Score.h"
 
 float aspectRatio = 16./9;
 
 
+
+
+
 void Game::init(){
 
+    bool fine = om.loadAll();
+
+    _bestScore = sc::readBestScore();
+
     rw.create(
-        sf::VideoMode(
-            1600, 900, 32),
-        "Dino");
+            sf::VideoMode(
+                1600, 900, 32),
+            "Dino");
     rw.setFramerateLimit(60);
     rw.setKeyRepeatEnabled(false);
 
     _menu.init();
+    _run.init();
 
     view = sf::View(sf::FloatRect(0, 0, 1600, 900));
     rw.setView(view);
 
-
     rw.display();
     rw.requestFocus();
-    bool fine = om.loadAll();
     fmt::println("Loaded fine {}", fine);
-    
+
+
 
 }
 
@@ -69,7 +79,7 @@ void Game::start(){
                 _run.playLoop(event);
                 break;
             case GameOver:
-                _run.gameOverLoop(event);
+                _menu.gameOverLoop(event);
                 break;
 
         }
@@ -86,21 +96,30 @@ void Game::clear(){
 
 void Game::draw(){
     om.drawAll(rw);
+    _run.drawObstacles();
 }
 
 void Game::display(){
     rw.display();
 }
 
-void Game::quit(){
-    _state = Exiting;
+void Game::setState(const State& state){
+    if(state == Playing){
+        _run.restart();
+
+    }else if(state == InMenu){
+        _menu.updateScore();
+        _run.restart();
+    }
+
+    _state = state;
 }
 
-void Game::play(){
-    _state = Playing;
-    _run.restart();
+int Game::getBestScore(){
+    return _bestScore;
 }
 
-void Game::gameOver(){
-    _state = GameOver;
+void Game::setBestScore(const int& score){
+    _bestScore = score;
+    sc::writeBestScore(score); 
 }

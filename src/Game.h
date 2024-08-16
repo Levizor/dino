@@ -9,6 +9,9 @@
 #include "SFML/System/Vector2.hpp"
 #include "ObjectManager.h"
 
+enum State{
+    Exiting, Playing, InMenu, GameOver
+};
 
 class Game{
 
@@ -24,25 +27,26 @@ class Game{
 
         void init();
         void start();
-        void play();
-        void gameOver();
-        void quit();
         void display();
         bool isExiting();
 
+        void setState(const State& state);
 
+        int getBestScore();
+        void setBestScore(const int& score);
 
-    private:
-        enum State{
-            Exiting, Playing, InMenu, GameOver
-        };
-
-        sf::View view;
-
-        State _state;
 
         Menu _menu;
         Run _run;
+
+    private:
+
+            sf::View view;
+
+            State _state;
+
+
+            int _bestScore;
 
 
 };
