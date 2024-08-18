@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SFML/Audio/Music.hpp"
+#include "SFML/Audio/Sound.hpp"
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/Text.hpp"
 #include "SFML/System/Clock.hpp"
@@ -34,6 +36,9 @@ class Run{
         sf::Text _bestScore;
 
         float _speedModifier=8;
+        int x=1600;
+
+        sf::Sound jump;
 
         float time=0;
         int score=0;

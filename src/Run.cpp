@@ -1,9 +1,11 @@
 #include "Run.h"
 #include "Game.h"
+#include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Window/Event.hpp"
 #include "SFML/Window/Keyboard.hpp"
 #include "SFML/Window/Mouse.hpp"
 #include "fmt/core.h"
+#include <cstdlib>
 #include <ctime>
 #include "Score.h"
 
@@ -22,16 +24,20 @@ void Run::init(){
     _bestScore.setFont(*_game.om.getFont());
     _bestScore.setFillColor(sf::Color(0xf7b801ff));
     _bestScore.setCharacterSize(50);
-    _bestScore.setString(fmt::format("HI: {:08}", _game.getBestScore()));
+    _bestScore.setString(fmt::format("HI {:08}", _game.getBestScore()));
 
     _bestScore.setOrigin(_score.getGlobalBounds().width, 0);
     _bestScore.setPosition(_score.getGlobalBounds().left-150, 10);
+
+    jump.setBuffer(_game.om.getJumpBuffer());
+    jump.setVolume(4);
 }
 
 void Run::playLoop(const sf::Event& event){
 
     if(isGameOver()){
         _game.setState(GameOver);
+        _game.om.getDino()->setOverTexture();
         if(score>_game.getBestScore()){
             _game.setBestScore(score);
             _bestScore.setString(fmt::format("HI: {:08}", _game.getBestScore()));
@@ -42,7 +48,10 @@ void Run::playLoop(const sf::Event& event){
     ObjMan& om = _game.om;
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) or event.type == sf::Event::MouseButtonPressed){
-        om.getDino()->jump();
+        if(!om.getDino()->isJumping){
+            om.getDino()->jump();
+            jump.play();
+        }
     }
 
     float deltaTime = _clock.restart().asSeconds();
@@ -50,13 +59,13 @@ void Run::playLoop(const sf::Event& event){
     score=time*_speedModifier;
 
     timeSinceSpeedIncrease+=deltaTime;
-    if(timeSinceSpeedIncrease>3 and _speedModifier<30){
+    if(timeSinceSpeedIncrease>3 and _speedModifier<20){
         timeSinceSpeedIncrease=0;
         _speedModifier+=1;
     }
 
     timeSinceLastObstacle+=deltaTime; 
-    if(timeSinceLastObstacle>=1.5 and std::rand()%5==1){
+    if(timeSinceLastObstacle>=1){
         timeSinceLastObstacle=0;
         addObstacle();
     }
@@ -75,7 +84,10 @@ void Run::playLoop(const sf::Event& event){
 
 void Run::restart(){
     _clock.restart();
+    _game.om.getDino()->setDefaultTexture();
     _game.om.getDino()->jump();
+    _game.om.getDino()->update(1);
+
     for(sf::Sprite* ob: _obstacles){
         delete ob;
     }
@@ -84,16 +96,71 @@ void Run::restart(){
     time=0;
     timeSinceSpeedIncrease=0;
     timeSinceLastObstacle=0;
+    x=1600;
 }
 
 void Run::addObstacle(){
-    sf::Sprite* o = new sf::Sprite();    
-    o->setTexture(_game.om.getRandomTexture());
-    o->setScale(0.7, 0.7);
-    o->setPosition(2000+std::rand()%800, 700);
-    o->setOrigin((o->getTextureRect()).width, o->getTextureRect().height);
+    if(!_obstacles.empty())
+        x = _obstacles.back()->getPosition().x;
 
-    _obstacles.push_back(o);
+    int posx = x+1100+std::rand()%1000;
+    if(posx<=1800){
+        posx=2000;
+    }
+
+    if(_speedModifier>12 and std::rand()%3==0){
+        
+
+        int c=2;
+        if(_speedModifier>18){
+            c+=std::rand()%2;
+        }
+
+
+        for(int i=0; i<c; i++){
+            sf::Sprite* o = new sf::Sprite();
+            o->setTexture(_game.om.getRandomTexture());
+            o->setScale(0.7, 0.7);
+            o->setOrigin((o->getGlobalBounds()).width, o->getGlobalBounds().height);
+            posx+=o->getGlobalBounds().width+20;
+            o->setPosition(posx, 660);
+            _obstacles.push_back(o);
+        }
+
+
+    }else if(_speedModifier>16 and std::rand()%3==0){
+        sf::Sprite* pit = new sf::Sprite();        
+
+        pit->setTexture(_game.om.getPitTexture());
+        pit->setScale(0.7, 0.7);
+        pit->setOrigin(pit->getGlobalBounds().width, pit->getGlobalBounds().height);
+        pit->setPosition(posx, 720);
+        _obstacles.push_back(pit);
+
+
+    }else if(_speedModifier>10 and std::rand()%3==1){
+        Object* drone = new Object();
+
+        drone->setTextures(_game.om.getDroneTextures());
+        drone->setScale(2.4, 2.4);
+        drone->setOrigin(drone->getGlobalBounds().width, drone->getGlobalBounds().height);
+
+        if(std::rand()%2==1){
+            drone->setPosition(posx, 450);
+        }else{
+            drone->setPosition(posx, 800);
+        }
+        _obstacles.push_back(drone);
+    }else{
+        sf::Sprite* o = new sf::Sprite();    
+        o->setTexture(_game.om.getRandomTexture());
+        o->setScale(0.7, 0.7);
+        o->setOrigin((o->getGlobalBounds()).width, o->getGlobalBounds().height);
+        o->setPosition(posx, 660);
+
+        _obstacles.push_back(o);
+    }
+
 
 
 }
@@ -107,11 +174,20 @@ void Run::moveObstacles(const float& deltaTime){
     }
     for(sf::Sprite* ob:_obstacles){
         ob->move(-100*_speedModifier*deltaTime, 0);
+        if(Object* o = dynamic_cast<Object*>(ob)){
+            o->animate(deltaTime);
+        }
+        
     }
 
-    _game.om.getRoadLines()->move(-100*_speedModifier*deltaTime, 0);
-    if(_game.om.getRoadLines()->getPosition().x<=-1600){
-        _game.om.getRoadLines()->setPosition(0, 0);
+    if(_game.om.getBackground()->getPosition().x<-3200){
+        _game.om.getBackground()->setPosition(0, 0);
+    }
+    _game.om.getBackground()->move(-0.1*_speedModifier, 0);
+
+    _game.om.getRoad()->move(-100*_speedModifier*deltaTime, 0);
+    if(_game.om.getRoad()->getPosition().x<=-4800){
+        _game.om.getRoad()->setPosition(0, 0);
     }
 }
 
@@ -125,7 +201,11 @@ bool Run::isGameOver(){
     Dino * dino = _game.om.getDino();
     for(sf::Sprite* ob: _obstacles){
         if(dino->getHitbox().intersects(ob->getGlobalBounds())){
+            if(Object* o = dynamic_cast<Object*>(ob)){
+                o->setOverTexture();
+            }
             return true;
+
         }
     }
     return false;

@@ -7,16 +7,30 @@
 namespace fs = std::filesystem;
 
 #ifdef _WIN32
+#include <iostream>
 #include <windows.h>
-#include <shlobj.h>
+#include <shlobj.h>  // For SHGetKnownFolderPath
+#include <combaseapi.h>  // For CoTaskMemFree
+                         //
+std::string GetDocumentsPath() {
+    PWSTR path = nullptr;
+    std::string documentsPath;
 
-    std::string sc::getAppDataPath() {
-        std::string path;
-        if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, path))) {
-            return std::string(path) + "\\Dino\\score.txt";
-        }
-        return "";
+    // Get the path to the Documents folder
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &path))) {
+        // Convert the wide character string (PWSTR) to a standard string
+        char charPath[MAX_PATH];
+        wcstombs(charPath, path, MAX_PATH);
+        documentsPath = charPath;
     }
+
+    // Free the memory allocated by SHGetKnownFolderPath
+    if (path) {
+        CoTaskMemFree(path);
+    }
+
+    return documentsPath;
+}
 #endif
 
 
@@ -26,11 +40,11 @@ namespace fs = std::filesystem;
     }
 
     std::string sc::getScoreFilePath() {
-#ifdef _WIN32
-        return getAppDataPath();
-#else
-        return getConfigPath();
-#endif
+        #ifdef _WIN32
+            return getAppDataPath();
+        #else
+            return getConfigPath();
+        #endif
     }
 
 

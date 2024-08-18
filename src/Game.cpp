@@ -1,5 +1,4 @@
 #include "Game.h"
-#include "Globals.h"
 #include "SFML/Graphics/Rect.hpp"
 #include "SFML/Graphics/View.hpp"
 #include "SFML/Window/Event.hpp"
@@ -30,12 +29,16 @@ void Game::init(){
     _menu.init();
     _run.init();
 
+    gameOver.setBuffer(om.getGameOverBuffer());
+
     view = sf::View(sf::FloatRect(0, 0, 1600, 900));
     rw.setView(view);
 
     rw.display();
     rw.requestFocus();
+
     fmt::println("Loaded fine {}", fine);
+
 
 
 
@@ -91,7 +94,7 @@ bool Game::isExiting(){
 }
 
 void Game::clear(){
-    rw.clear(BACKGROUND_COLOR);
+    rw.clear(sf::Color(0xDBDBDBFF));
 }
 
 void Game::draw(){
@@ -104,14 +107,20 @@ void Game::display(){
 }
 
 void Game::setState(const State& state){
-    if(state == Playing){
-        _run.restart();
 
-    }else if(state == InMenu){
-        _menu.updateScore();
-        _run.restart();
+    switch(state){
+        case Playing:
+            _run.restart();
+            break;
+        case InMenu:
+            _menu.updateScore();
+            _run.restart();
+        break;
+        case GameOver:
+            gameOver.play(); 
+            break;
+
     }
-
     _state = state;
 }
 

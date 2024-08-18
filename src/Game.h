@@ -3,6 +3,9 @@
 
 #include "Menu.h"
 #include "Run.h"
+#include "SFML/Audio/Music.hpp"
+#include "SFML/Audio/Sound.hpp"
+#include "SFML/Audio/SoundBuffer.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "SFML/Graphics/View.hpp"
 #include "SFML/System/Clock.hpp"
@@ -44,6 +47,8 @@ class Game{
             sf::View view;
 
             State _state;
+
+            sf::Sound gameOver;
 
 
             int _bestScore;

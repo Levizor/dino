@@ -117,6 +117,6 @@ void Menu::gameOverLoop(const sf::Event& event){
 }
 
 void Menu::updateScore(){
-    _bsLabel.setString(fmt::format("HI: {:08}", _game.getBestScore()));
+    _bsLabel.setString(fmt::format("HI {:08}", _game.getBestScore()));
 }
 
