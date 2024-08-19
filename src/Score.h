@@ -1,13 +1,8 @@
 
 #include <string>
 namespace sc{
-#ifdef _WIN32
-#include <windows.h>
-#include <shlobj.h>
 
-    std::string getAppDataPath();
-#endif
-
+    std::string getDocumentsPath();
 
     std::string getConfigPath();
 
